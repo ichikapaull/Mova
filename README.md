@@ -188,7 +188,7 @@ at `data/app.db` and start Mova; thumbnails are rebuilt automatically.
 | --- | --- |
 | Anywhere | `/` or `Ctrl+K` search |
 | Library | `Shift`/`Ctrl`+click multi-select · `Ctrl+A` select all · `Esc` clear selection |
-| Player | `Space`/`K` play/pause · `←`/`→` ±5 s · `J`/`L` ±10 s · `↑`/`↓` volume · `M` mute · `F` fullscreen · `P` picture-in-picture · `N` next · `Shift+P` previous · `0–9` jump to 0–90 % · `,`/`.` speed · `Esc` exit fullscreen |
+| Player | `Space`/`K` play/pause · `←`/`→` ±5 s · `J`/`L` ±10 s · `↑`/`↓` volume · `M` mute · `F` fullscreen · `P` picture-in-picture · `N` next · `Shift+P` previous · `S` shuffle · `0–9` jump to 0–90 % · `,`/`.` speed · `Esc` exit fullscreen |
 
 ## Troubleshooting
 

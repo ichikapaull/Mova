@@ -338,7 +338,7 @@ export function SettingsView(props: SettingsViewProps) {
 
         {/* ------------------------------------------------------------ Player */}
         <Section id="player" title="Player">
-          <Row title="Autoplay next episode" description="When a series episode or linked continuation ends.">
+          <Row title="Autoplay next episode" description="When a series episode, collection video, linked continuation or shuffled video ends.">
             <Switch checked={settings.autoplayNextEpisode} onCheckedChange={(v) => update("autoplayNextEpisode", v)} />
           </Row>
           <Row title="Countdown before next episode">

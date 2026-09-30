@@ -13,6 +13,7 @@ import {
   PictureInPicture2Icon,
   PlayIcon,
   RotateCcwIcon,
+  ShuffleIcon,
   SkipBackIcon,
   SkipForwardIcon,
   Volume1Icon,
@@ -40,6 +41,7 @@ import { Tooltip } from "@/components/ui/tooltip";
 import { streamUrl, thumbnailUrl, watchHref } from "@/lib/client/media-urls";
 import { callAction } from "@/lib/client/run-action";
 import { formatDuration } from "@/lib/format";
+import { newShuffleSeed, shuffleListParam } from "@/lib/shuffle";
 import { clamp, cn } from "@/lib/utils";
 import { openExternallyAction, showInFolderAction } from "@/server/actions/media";
 import type { PlaybackContext } from "@/server/repositories/playback";
@@ -136,6 +138,9 @@ export function VideoPlayer({ media, context, resumeAt, startAt, autoplayNext, c
   const next = context.next;
   const previous = context.previous;
   const listOption = { list: context.listParam };
+  const shuffling = context.kind === "shuffle";
+  // Folder order is only a fallback for manual skipping; it never auto-advances.
+  const autoAdvance = autoplayNext && context.kind !== "folder";
 
   // ---------------------------------------------------------------- helpers
   const flash = useCallback((text: string) => {
@@ -219,6 +224,12 @@ export function VideoPlayer({ media, context, resumeAt, startAt, autoplayNext, c
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [reportNow, router, context.listParam],
   );
+
+  /** Swaps the playback context in place; the same video keeps playing. */
+  const toggleShuffle = useCallback(() => {
+    router.replace(watchHref(media.id, { list: shuffling ? null : shuffleListParam(newShuffleSeed()) }), { scroll: false });
+    flash(shuffling ? "Shuffle off" : "Shuffle on");
+  }, [router, media.id, shuffling, flash]);
 
   // ---------------------------------------------------------------- setup
   useEffect(() => {
@@ -359,6 +370,9 @@ export function VideoPlayer({ media, context, resumeAt, startAt, autoplayNext, c
         case "n":
           if (next) goTo(next.id);
           break;
+        case "s":
+          toggleShuffle();
+          break;
         case "Home":
           seekTo(0);
           break;
@@ -495,7 +509,7 @@ export function VideoPlayer({ media, context, resumeAt, startAt, autoplayNext, c
           setPlaying(false);
           setEnded(true);
           reportNow({ ended: true });
-          if (next && autoplayNext) setCountdown(countdownSec);
+          if (next && autoAdvance) setCountdown(countdownSec);
         }}
         onError={handleVideoError}
       />
@@ -580,6 +594,18 @@ export function VideoPlayer({ media, context, resumeAt, startAt, autoplayNext, c
               </Button>
             </Tooltip>
           )}
+          <Tooltip content={shuffling ? "Shuffle on" : "Shuffle"} shortcut="S">
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn("text-white hover:bg-white/10 hover:text-white", shuffling && "text-brand hover:text-brand")}
+              onClick={toggleShuffle}
+              aria-label="Shuffle"
+              aria-pressed={shuffling}
+            >
+              <ShuffleIcon className="size-5" />
+            </Button>
+          </Tooltip>
 
           <div className="group/volume flex items-center">
             <Tooltip content={muted ? "Unmute" : "Mute"} shortcut="M">

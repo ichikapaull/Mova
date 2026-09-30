@@ -283,6 +283,18 @@ export function listByCategory(categoryId: number, limit = 24): MediaListItem[] 
     .map(toListItem);
 }
 
+export type PlayableMedia = { id: number; sourceId: number; sourceName: string; relativePath: string };
+
+/** Everything the player can move to: visible and on a reachable source. Unordered. */
+export function listPlayableMedia(): PlayableMedia[] {
+  return getDb()
+    .select({ id: m.id, sourceId: m.sourceId, sourceName: src.name, relativePath: m.relativePath })
+    .from(m)
+    .innerJoin(src, eq(src.id, m.sourceId))
+    .where(and(visibilityCondition(), eq(src.isOnline, true)))
+    .all();
+}
+
 /** Fetches list items for explicit ids, preserving the given order. */
 export function listMediaItemsByIds(ids: number[], options: { includeUnavailable?: boolean } = {}): MediaListItem[] {
   if (ids.length === 0) return [];
