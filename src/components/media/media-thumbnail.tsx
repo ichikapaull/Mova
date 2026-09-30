@@ -54,6 +54,10 @@ export function MediaThumbnail({
           loading={eager ? "eager" : "lazy"}
           decoding="async"
           draggable={false}
+          // A server-rendered image can finish loading before hydration attaches onLoad.
+          ref={(img) => {
+            if (img?.complete && img.naturalWidth > 0) setLoaded(true);
+          }}
           onLoad={() => setLoaded(true)}
           onError={() => setFailed(true)}
           className={cn(
