@@ -39,10 +39,20 @@ export function parseEpisodeFromFilename(filename: string): ParsedEpisode {
   return { seasonNumber: null, episodeNumber: null };
 }
 
-/** Turns "Naruto.Shippuden.S01E02.1080p.mkv" into "Naruto Shippuden S01E02". */
+/** Bracketed release metadata: resolutions, codecs, sources and CRC hashes. */
+const RELEASE_TAG =
+  /\s*[[(](?:[^\])]*?\b(?:\d{3,4}p|4k|uhd|x26[45]|h\.?26[45]|hevc|avc|aac|flac|opus|ac3|dts|10.?bit|bd(?:rip)?|blu-?ray|web(?:-?dl|rip)?|hdr|dual.?audio|multi.?sub)\b[^\])]*|[0-9a-f]{8})[\])]/gi;
+
+/**
+ * Human-readable title from a filename: drops the extension, a leading
+ * "[ReleaseGroup]" and bracketed tags like "[1080p]" or "[ABCD1234]", and turns
+ * dots/underscores into spaces. "[Sub] Naruto - 01 [720p].mkv" → "Naruto - 01".
+ */
 export function titleFromFilename(filename: string): string {
   const withoutExt = filename.replace(/\.[a-z0-9]{2,4}$/i, "");
   const cleaned = withoutExt
+    .replace(/^\s*\[[^\]]*\]\s*/, "")
+    .replace(RELEASE_TAG, "")
     .replace(/[._]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();

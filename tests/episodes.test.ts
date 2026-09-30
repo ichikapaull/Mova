@@ -72,3 +72,15 @@ describe("series ordering", () => {
     expect(findAdjacentEpisodes(episodes, 99).index).toBe(-1);
   });
 });
+
+describe("titleFromFilename release tags", () => {
+  it.each([
+    ["[Sub] Naruto - 01 [720p].mkv", "Naruto - 01"],
+    ["[SubsPlease] Frieren - 12 (1080p) [ABCD1234].mkv", "Frieren - 12"],
+    ["Your Name (2016) [BluRay 1080p x265].mkv", "Your Name (2016)"],
+    ["Show.S01E02.Title.mkv", "Show S01E02 Title"],
+    ["[Only brackets].mp4", "[Only brackets]"],
+  ])("%s → %s", (input, expected) => {
+    expect(titleFromFilename(input)).toBe(expected);
+  });
+});

@@ -32,6 +32,7 @@ export type MediaCardProps = {
 };
 
 function metaLine(item: MediaListItem, subtitle?: string | null): string {
+  if (item.durationSec == null && item.thumbnailStatus === "failed") return "Unreadable file";
   return [subtitle ?? item.episodeLabel, formatDuration(item.durationSec) !== "--:--" ? formatDuration(item.durationSec) : null, formatResolution(item.width, item.height), item.categoryName]
     .filter(Boolean)
     .join(" • ");

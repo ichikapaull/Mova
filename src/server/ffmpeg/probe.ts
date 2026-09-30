@@ -79,7 +79,11 @@ export async function probeMediaFile(filePath: string): Promise<ProbeResult> {
     ["-v", "error", "-print_format", "json", "-show_format", "-show_streams", "--", filePath],
     { timeoutMs: 30_000 },
   );
-  if (result.code !== 0) throw new ProcessError(`ffprobe failed: ${summarizeFfmpegError(result.stderr)}`, result);
+  if (result.code !== 0) {
+    // ffprobe prefixes errors with the full path; keep the message short.
+    const reason = summarizeFfmpegError(result.stderr).split(`${filePath}: `).join("");
+    throw new ProcessError(`Unreadable video: ${reason}`, result);
+  }
   try {
     return parseProbeOutput(result.stdout);
   } catch {
