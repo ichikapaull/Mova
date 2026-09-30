@@ -1,0 +1,60 @@
+import {
+  BookOpenIcon,
+  CameraIcon,
+  ClapperboardIcon,
+  FilmIcon,
+  FlameIcon,
+  FolderIcon,
+  GamepadIcon,
+  GhostIcon,
+  GraduationCapIcon,
+  HeartIcon,
+  type LucideIcon,
+  MicIcon,
+  MountainIcon,
+  MusicIcon,
+  PaletteIcon,
+  PlaneIcon,
+  RocketIcon,
+  ScissorsIcon,
+  SmileIcon,
+  SparklesIcon,
+  StarIcon,
+  SwordsIcon,
+  TrophyIcon,
+  TvIcon,
+  VideoIcon,
+} from "lucide-react";
+
+/** Curated icon set for categories (keeps the bundle small vs. importing every icon). */
+export const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  folder: FolderIcon,
+  film: FilmIcon,
+  clapperboard: ClapperboardIcon,
+  tv: TvIcon,
+  video: VideoIcon,
+  sparkles: SparklesIcon,
+  swords: SwordsIcon,
+  scissors: ScissorsIcon,
+  music: MusicIcon,
+  mic: MicIcon,
+  "book-open": BookOpenIcon,
+  "graduation-cap": GraduationCapIcon,
+  gamepad: GamepadIcon,
+  trophy: TrophyIcon,
+  smile: SmileIcon,
+  ghost: GhostIcon,
+  heart: HeartIcon,
+  star: StarIcon,
+  flame: FlameIcon,
+  rocket: RocketIcon,
+  camera: CameraIcon,
+  mountain: MountainIcon,
+  plane: PlaneIcon,
+  palette: PaletteIcon,
+};
+
+export function CategoryIcon({ name, className }: { name: string | null | undefined; className?: string }) {
+  const Icon = (name && CATEGORY_ICONS[name]) || FolderIcon;
+  return <Icon className={className} />;
+}
