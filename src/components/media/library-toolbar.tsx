@@ -22,6 +22,7 @@ import {
 } from "@/lib/library-query";
 import { normalizeSearchText } from "@/lib/search";
 import type { Settings } from "@/lib/settings";
+import { formatCount } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 const FILE_TYPES = ["mp4", "mkv", "webm", "mov", "avi", "m4v", "wmv", "ts"];
@@ -57,7 +58,7 @@ export function LibraryToolbar({
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center gap-2">
         <p className="mr-auto text-sm text-muted-foreground tabular-nums">
-          {total == null ? " " : `${total.toLocaleString()} ${total === 1 ? "video" : "videos"}`}
+          {total == null ? " " : `${formatCount(total)} ${total === 1 ? "video" : "videos"}`}
         </p>
 
         <Select value={sort} onValueChange={(value) => onChange({ ...query, sort: value as SortKey, dir: undefined })}>

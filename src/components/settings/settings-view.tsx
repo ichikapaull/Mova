@@ -25,7 +25,7 @@ import { Switch } from "@/components/ui/switch";
 import { invalidateLibraryCache } from "@/lib/client/library-cache";
 import { callAction } from "@/lib/client/run-action";
 import { useActivity } from "@/lib/client/use-activity";
-import { formatBytes, formatRelativeTime, pluralize } from "@/lib/format";
+import { formatBytes, formatCount, formatRelativeTime, pluralize } from "@/lib/format";
 import type { Settings } from "@/lib/settings";
 import { cn } from "@/lib/utils";
 import {
@@ -201,15 +201,15 @@ export function SettingsView(props: SettingsViewProps) {
             const watchFailed = props.watcher.failed.find((f) => f.sourceId === source.id);
             return (
               <div key={source.id} className={cn("flex flex-col gap-3 px-5 py-4", !source.enabled && "opacity-60")}>
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <HardDriveIcon className="size-4 shrink-0 text-muted-foreground" />
                       <Input
                         defaultValue={source.name}
                         aria-label="Source name"
                         onBlur={(e) => e.target.value.trim() !== source.name && void callAction(updateSourceAction(source.id, { name: e.target.value })).then(refresh)}
-                        className="h-7 w-auto border-transparent bg-transparent px-1 text-sm font-medium hover:border-input"
+                        className="field-sizing-content h-7 w-auto max-w-full min-w-16 border-transparent bg-transparent px-1 text-sm font-medium hover:border-input"
                       />
                       {!source.isOnline && (
                         <Badge variant="warning">
@@ -233,10 +233,10 @@ export function SettingsView(props: SettingsViewProps) {
                 </div>
                 <div className="flex flex-wrap items-center gap-x-5 gap-y-2 pl-6 text-xs text-muted-foreground">
                   <span>
-                    <strong className="font-medium text-foreground">{source.videoCount.toLocaleString()}</strong> videos
+                    <strong className="font-medium text-foreground">{formatCount(source.videoCount)}</strong> videos
                   </span>
                   {source.missingCount > 0 && <span className="text-warning">{source.missingCount} missing</span>}
-                  <span>Last scan: {formatRelativeTime(source.lastScanAt)}</span>
+                  <span suppressHydrationWarning>Last scan: {formatRelativeTime(source.lastScanAt)}</span>
                   <span className="flex items-center gap-1.5">
                     Default category:
                     <Select
@@ -329,7 +329,7 @@ export function SettingsView(props: SettingsViewProps) {
               </SelectContent>
             </Select>
           </Row>
-          <Row title="Generate missing previews now" description={`${props.storage.previews.files.toLocaleString()} previews cached.`}>
+          <Row title="Generate missing previews now" description={`${formatCount(props.storage.previews.files)} previews cached.`}>
             <Button variant="secondary" size="sm" onClick={() => void callAction(generateAllPreviewsAction(), { success: (n) => `Queued ${pluralize(n, "preview")}` })}>
               Generate
             </Button>
@@ -429,12 +429,12 @@ export function SettingsView(props: SettingsViewProps) {
               <DatabaseIcon className="size-4" /> {formatBytes(props.storage.dbBytes)}
             </span>
           </Row>
-          <Row title="Thumbnail cache" description={`${props.storage.thumbnails.files.toLocaleString()} files · ${formatBytes(props.storage.thumbnails.bytes)}`}>
+          <Row title="Thumbnail cache" description={`${formatCount(props.storage.thumbnails.files)} files · ${formatBytes(props.storage.thumbnails.bytes)}`}>
             <Button variant="secondary" size="sm" onClick={() => void callAction(clearCacheAction("thumbnails"), { success: "Thumbnail cache cleared; regenerating…" }).then(refresh)}>
               Clear
             </Button>
           </Row>
-          <Row title="Preview cache" description={`${props.storage.previews.files.toLocaleString()} files · ${formatBytes(props.storage.previews.bytes)}`}>
+          <Row title="Preview cache" description={`${formatCount(props.storage.previews.files)} files · ${formatBytes(props.storage.previews.bytes)}`}>
             <Button variant="secondary" size="sm" onClick={() => void callAction(clearCacheAction("previews"), { success: "Preview cache cleared" }).then(refresh)}>
               Clear
             </Button>

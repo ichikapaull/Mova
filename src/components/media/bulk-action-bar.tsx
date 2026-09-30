@@ -1,5 +1,6 @@
 "use client";
 
+import { formatCount } from "@/lib/format";
 import { CheckCircle2Icon, FolderPlusIcon, HeartIcon, ShapesIcon, TagIcon, Trash2Icon, TvIcon, XIcon } from "lucide-react";
 import { useMediaActions } from "@/components/media/media-actions";
 import { Button } from "@/components/ui/button";
@@ -20,7 +21,7 @@ export function BulkActionBar({ ids, onClear }: { ids: number[]; onClear: () => 
         aria-label="Bulk actions"
         className="pointer-events-auto flex animate-scale-in items-center gap-1 rounded-xl border border-border-strong bg-[#161616]/95 p-1.5 shadow-2xl shadow-black/70 backdrop-blur-xl"
       >
-        <span className="px-3 text-sm font-medium tabular-nums">{ids.length.toLocaleString()} selected</span>
+        <span className="px-3 text-sm font-medium tabular-nums">{formatCount(ids.length)} selected</span>
         <div className="mx-1 h-5 w-px bg-border-strong" />
         <Button variant="ghost" size="sm" onClick={run(() => actions.setFavorite(ids, true))}>
           <HeartIcon /> <span className="hidden md:inline">Favorite</span>

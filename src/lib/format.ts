@@ -1,3 +1,9 @@
+/**
+ * Fixed UI locale: server and browser must format identically (hydration),
+ * and the interface is English.
+ */
+const LOCALE = "en-GB";
+
 /** 754 → "12:34", 3754 → "1:02:34". */
 export function formatDuration(totalSeconds: number | null | undefined): string {
   if (totalSeconds == null || !Number.isFinite(totalSeconds) || totalSeconds < 0) return "--:--";
@@ -14,6 +20,11 @@ export function formatRuntime(totalSeconds: number | null | undefined): string {
   if (totalSeconds == null || !Number.isFinite(totalSeconds)) return "";
   const minutes = Math.round(totalSeconds / 60);
   if (totalSeconds < 60) return `${Math.round(totalSeconds)}s`;
+  if (totalSeconds < 600) {
+    const m = Math.floor(totalSeconds / 60);
+    const s = Math.round(totalSeconds % 60);
+    return s ? `${m}m ${s}s` : `${m}m`;
+  }
   if (minutes < 60) return `${minutes}m`;
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
@@ -48,12 +59,12 @@ export function formatResolution(width: number | null | undefined, height: numbe
 
 export function formatDate(timestamp: number | null | undefined): string {
   if (!timestamp) return "—";
-  return new Date(timestamp).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+  return new Date(timestamp).toLocaleDateString(LOCALE, { year: "numeric", month: "short", day: "numeric" });
 }
 
 export function formatDateTime(timestamp: number | null | undefined): string {
   if (!timestamp) return "—";
-  return new Date(timestamp).toLocaleString(undefined, {
+  return new Date(timestamp).toLocaleString(LOCALE, {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -66,7 +77,7 @@ export function formatRelativeTime(timestamp: number | null | undefined, now = D
   if (!timestamp) return "never";
   const diff = Math.round((timestamp - now) / 1000);
   const abs = Math.abs(diff);
-  const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+  const rtf = new Intl.RelativeTimeFormat(LOCALE, { numeric: "auto" });
   if (abs < 60) return rtf.format(diff, "second");
   if (abs < 3600) return rtf.format(Math.round(diff / 60), "minute");
   if (abs < 86400) return rtf.format(Math.round(diff / 3600), "hour");
@@ -81,6 +92,10 @@ export function formatEpisodeLabel(season: number | null | undefined, episode: n
   return `${s}${ep}` || null;
 }
 
+export function formatCount(value: number): string {
+  return value.toLocaleString(LOCALE);
+}
+
 export function pluralize(count: number, singular: string, plural = `${singular}s`): string {
-  return `${count.toLocaleString()} ${count === 1 ? singular : plural}`;
+  return `${count.toLocaleString(LOCALE)} ${count === 1 ? singular : plural}`;
 }
