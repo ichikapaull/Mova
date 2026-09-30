@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useGoBack } from "@/components/back-link";
 import { SeekBar } from "@/components/player/seek-bar";
 import { useProgressReporter } from "@/components/player/use-progress-reporter";
@@ -65,6 +65,12 @@ type Props = {
   autoplayNext: boolean;
   countdownSec: number;
 };
+
+const subscribeNever = () => () => {};
+/** PiP support is only known in the browser; the server renders without the button. */
+function usePictureInPictureSupported(): boolean {
+  return useSyncExternalStore(subscribeNever, () => document.pictureInPictureEnabled, () => false);
+}
 
 const SPEEDS = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 const HIDE_CONTROLS_AFTER_MS = 2800;
@@ -122,6 +128,7 @@ export function VideoPlayer({ media, context, resumeAt, startAt, autoplayNext, c
   const [resumePrompt, setResumePrompt] = useState(resumeAt != null && startAt == null);
   const [ended, setEnded] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
+  const pipSupported = usePictureInPictureSupported();
   const hideTimer = useRef(0);
   const clickTimer = useRef(0);
   const osdTimer = useRef(0);
@@ -221,6 +228,9 @@ export function VideoPlayer({ media, context, resumeAt, startAt, autoplayNext, c
     // State follows via the `volumechange` event.
     video.volume = stored.volume;
     video.muted = stored.muted;
+    // The source is attached only after hydration: a server-rendered `src` would start
+    // loading before React listens, and early `error`/`loadedmetadata` events would be lost.
+    video.src = streamUrl(media.id);
     if (startAt != null) video.currentTime = startAt;
     if (!resumePrompt) void video.play().catch(() => setPlaying(false));
     // Only on mount / media change.
@@ -433,7 +443,6 @@ export function VideoPlayer({ media, context, resumeAt, startAt, autoplayNext, c
     >
       <video
         ref={videoRef}
-        src={streamUrl(media.id)}
         preload="auto"
         playsInline
         className="absolute inset-0 size-full"
@@ -630,7 +639,7 @@ export function VideoPlayer({ media, context, resumeAt, startAt, autoplayNext, c
                 </DropdownMenuRadioGroup>
               </DropdownMenuContent>
             </DropdownMenu>
-            {typeof document !== "undefined" && document.pictureInPictureEnabled && (
+            {pipSupported && (
               <Tooltip content="Picture in picture" shortcut="P">
                 <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 hover:text-white" onClick={togglePip} aria-label="Picture in picture">
                   <PictureInPicture2Icon className="size-5" />
@@ -679,7 +688,7 @@ export function VideoPlayer({ media, context, resumeAt, startAt, autoplayNext, c
           <div className="flex w-[min(92vw,440px)] animate-scale-in flex-col gap-5 rounded-2xl border border-white/10 bg-[#141414]/95 p-6 shadow-2xl">
             {next ? (
               <>
-                <p className="text-sm text-white/60">{countdown != null ? `Next ${context.kind === "series" ? "episode" : "video"} in ${countdown}` : "Up next"}</p>
+                <p className="text-sm text-white/60">{countdown != null ? `Next ${context.kind === "series" ? "episode" : "video"} in ${countdown} ${countdown === 1 ? "second" : "seconds"}` : "Up next"}</p>
                 <div className="flex items-center gap-4">
                   {/* eslint-disable-next-line @next/next/no-img-element -- local API image */}
                   <img src={`/api/media/${next.id}/thumbnail`} alt="" className="aspect-video w-32 rounded-md bg-white/5 object-cover" />
