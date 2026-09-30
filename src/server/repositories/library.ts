@@ -7,6 +7,7 @@ import {
   type ResolutionKey,
 } from "@/lib/library-query";
 import { escapeLike, tokenizeSearchQuery } from "@/lib/search";
+import { shuffleIds } from "@/lib/shuffle";
 import { getDb, schema } from "@/server/db";
 
 const m = schema.media;
@@ -246,15 +247,6 @@ export function listRecentlyAdded(limit = 24): MediaListItem[] {
   return baseSelect().where(visibilityCondition()).orderBy(desc(m.createdAt), desc(m.id)).limit(limit).all().map(toListItem);
 }
 
-export function listFavorites(limit = 24): MediaListItem[] {
-  return baseSelect()
-    .where(and(visibilityCondition(), eq(m.isFavorite, true)))
-    .orderBy(desc(m.favoritedAt), desc(m.id))
-    .limit(limit)
-    .all()
-    .map(toListItem);
-}
-
 export function listShortVideos(maxDurationSec = 300, limit = 24): MediaListItem[] {
   return baseSelect()
     .where(and(visibilityCondition(), sql`${m.durationSec} <= ${maxDurationSec}`))
@@ -293,6 +285,15 @@ export function listPlayableMedia(): PlayableMedia[] {
     .innerJoin(src, eq(src.id, m.sourceId))
     .where(and(visibilityCondition(), eq(src.isOnline, true)))
     .all();
+}
+
+/** The first `limit` videos of the shuffle order for `seed`. */
+export function listShuffled(seed: number, limit: number): MediaListItem[] {
+  const ids = shuffleIds(
+    listPlayableMedia().map((row) => row.id),
+    seed,
+  );
+  return listMediaItemsByIds(ids.slice(0, limit));
 }
 
 /** Fetches list items for explicit ids, preserving the given order. */

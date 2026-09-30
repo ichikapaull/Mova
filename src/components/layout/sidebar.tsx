@@ -2,6 +2,7 @@
 
 import {
   ClockIcon,
+  DicesIcon,
   FolderHeartIcon,
   HashIcon,
   HeartIcon,
@@ -25,6 +26,7 @@ const NAV = [
   { href: "/library", label: "Library", icon: LibraryIcon },
   { href: "/recent", label: "Recently Added", icon: ClockIcon },
   { href: "/favorites", label: "Favorites", icon: HeartIcon },
+  { href: "/random", label: "Random", icon: DicesIcon },
   { divider: true },
   { href: "/categories", label: "Categories", icon: ShapesIcon },
   { href: "/tags", label: "Tags", icon: HashIcon },

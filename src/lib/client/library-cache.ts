@@ -117,6 +117,11 @@ export function useLibraryData(queryKey: string) {
   return { total: entry.total, error: entry.error, getItem, ensureRange, isCached: entry.pages.has(0) };
 }
 
+/** Bumps whenever library data goes stale (mutations, scans, generated thumbnails). */
+export function useLibraryGeneration(): number {
+  return useSyncExternalStore(subscribe, () => generation, () => generation);
+}
+
 /** All ids for a query (select all / shift range selection across unloaded pages). */
 export async function fetchLibraryIds(queryKey: string): Promise<number[]> {
   const params = new URLSearchParams(queryKey);

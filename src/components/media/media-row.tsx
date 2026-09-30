@@ -13,12 +13,18 @@ export function MediaRow({
   href,
   items,
   clickAction,
+  list,
+  actions,
   children,
 }: {
   title: string;
   href?: string;
   items?: MediaListItem[];
   clickAction?: "details" | "play";
+  /** Playback context forwarded to the player (e.g. a shuffle order). */
+  list?: string | null;
+  /** Extra controls next to "See all". */
+  actions?: React.ReactNode;
   /** Custom cards instead of media items (series, collections). */
   children?: React.ReactNode;
 }) {
@@ -49,11 +55,14 @@ export function MediaRow({
     <section className="group/row relative">
       <div className="mb-3 flex items-baseline justify-between gap-4 px-6 lg:px-10">
         <h2 className="text-[17px] font-semibold tracking-tight text-foreground">{title}</h2>
-        {href && (
-          <Link href={href} className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground">
-            See all
-          </Link>
-        )}
+        <div className="flex items-center gap-3">
+          {actions}
+          {href && (
+            <Link href={href} className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground">
+              See all
+            </Link>
+          )}
+        </div>
       </div>
       <div className="relative">
         <div
@@ -63,7 +72,7 @@ export function MediaRow({
         >
           {items?.map((item, index) => (
             <div key={item.id} className="w-[min(78vw,270px)] shrink-0 snap-start lg:w-[clamp(240px,19vw,310px)]">
-              <MediaCard item={item} clickAction={clickAction} eager={index < 4} />
+              <MediaCard item={item} clickAction={clickAction} list={list} eager={index < 4} />
             </div>
           ))}
           {children}

@@ -4,15 +4,18 @@ import { redirect } from "next/navigation";
 import { HomeHero } from "@/components/media/home-hero";
 import { MediaRow, RowSlot } from "@/components/media/media-row";
 import { CollectionCard, SeriesCard } from "@/components/media/shelf-cards";
+import { RandomRow } from "@/components/media/random-picks";
 import { Button } from "@/components/ui/button";
+import { RANDOM_PICKS } from "@/lib/constants";
+import { newShuffleSeed } from "@/lib/shuffle";
 import { listCollections } from "@/server/repositories/collections";
 import {
   countVisibleMedia,
   listByCategory,
   listContinueWatching,
-  listFavorites,
   listRecentlyAdded,
   listShortVideos,
+  listShuffled,
 } from "@/server/repositories/library";
 import { listSeries } from "@/server/repositories/series";
 import { getSettings } from "@/server/repositories/settings";
@@ -29,7 +32,8 @@ export default function HomePage() {
 
   const continueWatching = listContinueWatching(20, settings.completedThreshold);
   const recent = listRecentlyAdded(24);
-  const favorites = listFavorites(24);
+  const randomSeed = newShuffleSeed();
+  const random = listShuffled(randomSeed, RANDOM_PICKS);
   const shortVideos = listShortVideos(300, 24);
   const categoryRows = listCategories()
     .filter((category) => category.count > 0)
@@ -45,7 +49,7 @@ export default function HomePage() {
       <HomeHero item={hero} eyebrow={heroEyebrow} />
       {continueWatching.length > 0 && <MediaRow title="Continue Watching" items={continueWatching} clickAction="play" />}
       <MediaRow title="Recently Added" href="/recent" items={recent} />
-      {favorites.length > 0 && <MediaRow title="Favorites" href="/favorites" items={favorites} />}
+      {random.length > 0 && <RandomRow initial={{ seed: randomSeed, items: random }} />}
       {series.length > 0 && (
         <MediaRow title="Series" href="/series">
           {series.slice(0, 20).map((s) => (
